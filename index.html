@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Dot Clock</title>
+  <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+
+  <!-- Don't use this in production: -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<style>
+  .mainContainer {
+    width: 900px;
+    /* background-color: yellow; */
+    margin: auto;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: monospace;
+    font-size: 20px;
+    border: 1px black solid;
+    padding: 40px;
+    margin-top: 10vh;
+  }
+
+  .circle {
+    height: 5px;
+    width: 5px;
+    border: 1px black solid;
+    border-radius: 50%;
+    margin: 2px;
+  }
+
+  .on {
+    background-color: black;
+  }
+
+  .off {
+    background-color: white;
+  }
+
+  .secondsContainer {
+    display: flex;
+    flex-direction: row;
+    /* border: 1px black solid; */
+    justify-content: space-between;
+    padding: 20px 10px;
+  }
+
+  .hourBox {
+    display: flex;
+    flex-wrap: wrap;
+    /* border: 1px black solid; */
+    flex-direction: row;
+    widtH: 120px;
+    justify-content: space-between;
+    height: auto;
+    margin: 10px;
+  }
+
+  .boxLabel {
+    width: 180px;
+    padding: 0px;
+    text-align: left;
+    margin: 0px;
+    font-size: 15px;
+  }
+
+  .hourBoxContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .timeContainer {
+    margin-bottom: 10px;
+  }
+
+  p {
+    padding: 0px;
+    margin: 0px;
+  }
+</style>
+
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+
+    Number.prototype.to2Str = function () {
+      const num = this
+      return num < 10 ? "0" + num : "" + num
+    }
+
+    function Circle({ className, ...props }) {
+      return (
+        <div className={`circle ${className}`} />
+      )
+    }
+
+    function SecondsRow({ seconds }) {
+      const arr = Array(59).fill("").map((e, i) => i + 1)
+
+      return (
+        <div className="secondsContainer">
+          {arr.map(e => <Circle key={e} className={e <= seconds ? "on" : "off"} />)}
+        </div>
+      )
+    }
+
+    function HourBox({ forHour, hours, minutes }) {
+      const arr = Array(60).fill("").map((e, i) => i)
+
+      return (
+        <div className="hourBox">
+          <p className="boxLabel">{forHour.to2Str()}</p>
+          {arr.map(e => <Circle key={e} className={forHour < hours ? "on" : forHour > hours ? "off" : e < minutes ? "on" : "off"} />)}
+        </div>
+      )
+    }
+
+    function HourBoxContainer({ hours, minutes }) {
+      const arr = Array(24).fill("").map((e, i) => i)
+
+      return (
+        <div className="hourBoxContainer">
+          {arr.map(e => <HourBox key={e} forHour={e} hours={hours} minutes={minutes} />)}
+        </div>
+      )
+
+    }
+
+    function Clock({ h, m, s }) {
+      return (
+        <div className="timeContainer">
+          <p>{h.to2Str()}:{m.to2Str()}:{s.to2Str()}</p>
+        </div>
+      )
+    }
+
+    function App() {
+
+      const [time, setTime] = React.useState(() => new Date)
+
+      const hours = time.getHours()
+      const minutes = time.getMinutes()
+      const seconds = time.getSeconds()
+
+      React.useEffect(() => {
+        const interval = setInterval(() => setTime(new Date), 1000)
+        console.log("hello")
+        return () => clearInterval(interval)
+      }, [])
+
+      return (
+        <div className="mainContainer">
+          <Clock h={hours} m={minutes} s={seconds} />
+          <SecondsRow seconds={seconds} />
+          {/*<HourBox forHour={22} hours={hours} minutes={minutes} />*/}
+          <HourBoxContainer hours={hours} minutes={minutes} />
+        </div>
+
+      )
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'))
+
+  </script>
+  <!--
+      Note: this page is a great way to try React but it's not suitable for production.
+      It slowly compiles JSX with Babel in the browser and uses a large development build of React.
+
+      Read this section for a production-ready setup with JSX:
+      https://reactjs.org/docs/add-react-to-a-website.html#add-jsx-to-a-project
+
+      In a larger project, you can use an integrated toolchain that includes JSX instead:
+      https://reactjs.org/docs/create-a-new-react-app.html
+
+      You can also use React without JSX, in which case you can remove Babel:
+      https://reactjs.org/docs/react-without-jsx.html
+    -->
+</body>
+
+</html>
